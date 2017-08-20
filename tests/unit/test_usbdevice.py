@@ -217,7 +217,7 @@ class TestUSBDevice(tests.util.TestCase):
 
         self.assertTrue(usb_device.is_input())
 
-    def test_is_input_returns_false_for_out_endpoint(self):
+    def test_is_input_returns_false_for_only_out_endpoint(self):
         usb_device = self._make_fake_raw_output_device()
 
         usb_device.connect()
@@ -231,12 +231,20 @@ class TestUSBDevice(tests.util.TestCase):
 
         self.assertTrue(usb_device.is_output())
 
-    def test_is_output_returns_false_for_in_endpoint(self):
+    def test_is_output_returns_false_for_only_in_endpoint(self):
         usb_device = self._make_fake_raw_input_device()
 
         usb_device.connect()
 
         self.assertFalse(usb_device.is_output())
+
+    def test_is_both_output_and_input_for_double_endpoint(self):
+        usb_device = self._make_fake_raw_device()
+
+        usb_device.connect()
+
+        self.assertTrue(usb_device.is_input())
+        self.assertTrue(usb_device.is_output())
 
     def test_flush_input_device(self):
         usb_device = self._make_fake_raw_input_device()
@@ -288,6 +296,7 @@ class TestUSBDevice(tests.util.TestCase):
     def test_write_raises_exception_on_error(self):
         fake_raw_device = fake_usb.FakeRawUSBDevice()
         stub_endpoint = unittest.mock.Mock()
+        stub_endpoint.bEndpointAddress = usb.util.ENDPOINT_OUT
         stub_endpoint.write.side_effect = usb.USBError('')
         fake_raw_device.configuration.interface.endpoint_list = [stub_endpoint]
         usb_device = usbdevice.USBDevice(fake_raw_device)
@@ -299,6 +308,7 @@ class TestUSBDevice(tests.util.TestCase):
     def test_write_raises_exception_on_incomplete_write(self):
         fake_raw_device = fake_usb.FakeRawUSBDevice()
         stub_endpoint = unittest.mock.Mock()
+        stub_endpoint.bEndpointAddress = usb.util.ENDPOINT_OUT
         stub_endpoint.write.return_value = 2
         fake_raw_device.configuration.interface.endpoint_list = [stub_endpoint]
         usb_device = usbdevice.USBDevice(fake_raw_device)
@@ -310,6 +320,7 @@ class TestUSBDevice(tests.util.TestCase):
     def test_write_logs_error(self):
         fake_raw_device = fake_usb.FakeRawUSBDevice()
         stub_endpoint = unittest.mock.Mock()
+        stub_endpoint.bEndpointAddress = usb.util.ENDPOINT_OUT
         stub_endpoint.write.side_effect = usb.USBError('')
         fake_raw_device.configuration.interface.endpoint_list = [stub_endpoint]
         usb_device = usbdevice.USBDevice(fake_raw_device)
@@ -322,8 +333,15 @@ class TestUSBDevice(tests.util.TestCase):
                 pass
 
     @staticmethod
+    def _make_fake_raw_device():
+        fake_raw_device = fake_usb.FakeRawUSBDevice()
+        return usbdevice.USBDevice(fake_raw_device)
+
+    @staticmethod
     def _make_fake_raw_input_device():
         fake_raw_device = fake_usb.FakeRawUSBDevice()
+        interface = fake_raw_device.configuration.interface
+        interface.endpoint_list = [interface.in_endpoint]
         return usbdevice.USBDevice(fake_raw_device)
 
     @staticmethod

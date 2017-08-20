@@ -97,12 +97,12 @@ class USBDevice:
     """Provide an interface to a connected USB device."""
 
     INTERFACE = 0
-    IN_ENDPOINT = 0
 
     def __init__(self, raw_device):
         """Initialize the device given a pyusb device."""
         self.raw_device = raw_device
-        self._endpoint = None
+        self._in_endpoint = None
+        self._out_endpoint = None
 
     def connect(self):
         """Connect to the usb device.
@@ -115,22 +115,21 @@ class USBDevice:
         self._detach_kernel_driver_if_attached()
         self._set_configuration()
         self._claim_interface()
-        self._endpoint = self._get_endpoint()
+        self._in_endpoint = self._get_in_endpoint()
+        self._out_endpoint = self._get_out_endpoint()
 
     def is_input(self):
         """Return if the device is an input."""
-        endpoint_address = self._endpoint.bEndpointAddress
-        direction = usb.util.endpoint_direction(endpoint_address)
-        return direction == usb.util.ENDPOINT_IN
+        return self._in_endpoint is not None
 
     def is_output(self):
         """Return if the device is an output."""
-        return not self.is_input()
+        return self._out_endpoint is not None
 
     def flush(self):
         """Flush the input buffer."""
         try:
-            while self._endpoint.read(1):
+            while self._in_endpoint.read(1):
                 pass
         except usb.core.USBError:
             pass
@@ -152,7 +151,7 @@ class USBDevice:
         not all data could be written.
         """
         try:
-            bytes_written = self._endpoint.write(data)
+            bytes_written = self._out_endpoint.write(data)
             if bytes_written != len(data):
                 self._handle_incomplete_write(bytes_written, data)
             return bytes_written
@@ -179,7 +178,7 @@ class USBDevice:
 
     def _read_non_blocking(self, number_of_bytes):
         try:
-            return bytes(self._endpoint.read(number_of_bytes))
+            return bytes(self._in_endpoint.read(number_of_bytes))
         except usb.core.USBError:
             return b''
 
@@ -218,10 +217,29 @@ class USBDevice:
     def _claim_interface(self):
         usb.util.claim_interface(self.raw_device, self.INTERFACE)
 
-    def _get_endpoint(self):
+    def _get_in_endpoint(self):
+        return self._get_endpoint_by_direction('in')
+
+    def _get_out_endpoint(self):
+        return self._get_endpoint_by_direction('out')
+
+    def _get_endpoints(self):
         active_configuration = self.raw_device.get_active_configuration()
-        interface = active_configuration.interfaces()[self.INTERFACE]
-        return interface.endpoints()[self.IN_ENDPOINT]
+        interface = active_configuration.interfaces()[0]
+        return interface.endpoints()
+
+    def _get_endpoint_by_direction(self, direction):
+        for endpoint in self._get_endpoints():
+            if self._endpoint_direction(endpoint) == direction:
+                return endpoint
+
+    @staticmethod
+    def _endpoint_direction(endpoint):
+        direction_map = {usb.util.ENDPOINT_IN: 'in',
+                         usb.util.ENDPOINT_OUT: 'out'}
+        endpoint_address = endpoint.bEndpointAddress
+        direction = usb.util.endpoint_direction(endpoint_address)
+        return direction_map[direction]
 
     def _format_message(self, template, **kwargs):
         return template.format(interface=self.INTERFACE,
