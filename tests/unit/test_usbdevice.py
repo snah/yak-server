@@ -10,7 +10,7 @@ import usb
 import tests.util
 from tests.doubles import fake_usb
 
-from yak_server import usbdevice
+from yakserver import usbdevice
 
 
 def patch_usb_find(match_count=1):
@@ -26,7 +26,7 @@ def patch_usb_find(match_count=1):
 
 
 class TestFind(tests.util.TestCase):
-    LOGGER = 'yak_server.usbdevice'
+    LOGGER = 'yakserver.usbdevice'
 
     def setUp(self):
         self.search_parameters = {'vendor_id': 1337,
@@ -38,7 +38,7 @@ class TestFind(tests.util.TestCase):
         self.expected_raw_device = {'idVendor': 1337,
                                     'idProduct': 42,
                                     'bcdDevice': 3}
-        logging.getLogger('yak_server.usbdevice').setLevel(100)
+        logging.getLogger('yakserver.usbdevice').setLevel(100)
 
     @patch_usb_find()
     def test_find_usb_device(self, usb_find_mock):
@@ -93,10 +93,10 @@ class TestFind(tests.util.TestCase):
 
 
 class TestUSBDevice(tests.util.TestCase):
-    LOGGER = 'yak_server.usbdevice'
+    LOGGER = 'yakserver.usbdevice'
 
     def setUp(self):
-        logging.getLogger('yak_server.usbdevice').setLevel(100)
+        logging.getLogger('yakserver.usbdevice').setLevel(100)
 
     def test_connect_detaches_kernel_driver(self):
         usb_device = self._make_fake_raw_input_device()
@@ -183,7 +183,7 @@ class TestUSBDevice(tests.util.TestCase):
                       usb_device.raw_device.claimed_interfaces)
 
     def test_connect_logs_claim_interface(self):
-        with self.assertLogs('yak_server.usbdevice', level='DEBUG') as logs:
+        with self.assertLogs('yakserver.usbdevice', level='DEBUG') as logs:
             usb_device = self._make_fake_raw_input_device()
             usb_device.connect()
 
@@ -192,7 +192,7 @@ class TestUSBDevice(tests.util.TestCase):
             self.assertIn('interface', log_output.lower())
 
     def test_connect_raises_exception_when_unable_to_claim_interface(self):
-        self.start_patch('yak_server.usbdevice.usb.util.claim_interface',
+        self.start_patch('yakserver.usbdevice.usb.util.claim_interface',
                          side_effect=usb.USBError(''))
         usb_device = self._make_fake_raw_input_device()
 
@@ -200,11 +200,11 @@ class TestUSBDevice(tests.util.TestCase):
             usb_device.connect()
 
     def test_connect_logs_when_unable_to_claim_interface(self):
-        self.start_patch('yak_server.usbdevice.usb.util.claim_interface',
+        self.start_patch('yakserver.usbdevice.usb.util.claim_interface',
                          side_effect=usb.USBError(''))
         usb_device = self._make_fake_raw_input_device()
 
-        with self.assertLogs('yak_server.usbdevice', level='ERROR') as logs:
+        with self.assertLogs('yakserver.usbdevice', level='ERROR') as logs:
             try:
                 usb_device.connect()
             except usbdevice.USBError:
@@ -315,7 +315,7 @@ class TestUSBDevice(tests.util.TestCase):
         usb_device = usbdevice.USBDevice(fake_raw_device)
         usb_device.connect()
 
-        with self.assertLogs('yak_server.usbdevice', level='ERROR') as logs:
+        with self.assertLogs('yakserver.usbdevice', level='ERROR') as logs:
             try:
                 usb_device.write(b'test')
             except usbdevice.USBError:

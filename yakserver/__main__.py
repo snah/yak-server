@@ -1,9 +1,9 @@
 #! /usr/bin/env python3
 
-"""The yak_server application."""
+"""The yakserver application."""
 
-from yak_server import interface
-from yak_server import events
+from yakserver import interface
+from yakserver import events
 
 
 class Application:

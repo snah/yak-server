@@ -1,7 +1,7 @@
 """Devices various interfaces that are connected to the server."""
 
-from yak_server import usbdevice
-from yak_server import translators
+from yakserver import usbdevice
+from yakserver import translators
 
 
 class Interface:

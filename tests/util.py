@@ -43,7 +43,7 @@ def return_first(first, *args, **kwars):
 
 def run_for_iterations(count):
     """Run the server for 'count' iterations."""
-    patch_target = 'yak_server.__main__.Application.server_running'
+    patch_target = 'yakserver.__main__.Application.server_running'
     return unittest.mock.patch(patch_target,
                                new=_return_true_for_iterations(count))
 

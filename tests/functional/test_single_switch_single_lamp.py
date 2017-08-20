@@ -10,9 +10,9 @@ import queue
 from tests import util
 import tests.doubles
 
-import yak_server.__main__
-from yak_server import usbdevice
-from yak_server import translators
+import yakserver.__main__
+from yakserver import usbdevice
+from yakserver import translators
 
 
 MAX_WAIT_TIME = 2
@@ -28,7 +28,7 @@ class TestSingleSwitchSingleLamp(util.TestCase):
     ITERATIONS = 3
 
     def setUp(self):
-        self.start_patch('yak_server.usbdevice.find',
+        self.start_patch('yakserver.usbdevice.find',
                          side_effect=self.map_mock_device)
 
         self.mock_switch_device = tests.doubles.FakeSwitchDeviceV0_0_0()
@@ -70,7 +70,7 @@ class TestSingleSwitchSingleLamp(util.TestCase):
         self.thread.start()
 
     def run_server(self):
-        yak_server.__main__.main()
+        yakserver.__main__.main()
 
     def wait_for_server_shutdown(self):
         self.thread.join(2)
@@ -79,10 +79,10 @@ class TestSingleSwitchSingleLamp(util.TestCase):
         self.output_queue.put(data)
 
     def assert_lamp_is_on(self):
-        self.assert_last_event(yak_server.events.LampOnEvent())
+        self.assert_last_event(yakserver.events.LampOnEvent())
 
     def assert_lamp_is_off(self):
-        self.assert_last_event(yak_server.events.LampOffEvent())
+        self.assert_last_event(yakserver.events.LampOffEvent())
 
     def assert_last_event(self, event):
         data = self.output_queue.get(timeout=MAX_WAIT_TIME)

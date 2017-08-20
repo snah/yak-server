@@ -1,6 +1,6 @@
 import queue
 
-from yak_server import usbdevice
+from yakserver import usbdevice
 
 
 class FakeUsbDeviceBase:

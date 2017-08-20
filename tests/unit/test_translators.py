@@ -4,16 +4,16 @@
 
 from tests import util
 
-import yak_server.translators
-import yak_server.events
+import yakserver.translators
+import yakserver.events
 
 
 class TestLookupTranslator(util.TestCase):
-    class ConcreteLookupTranslator(yak_server.translators.LookupTranslator):
+    class ConcreteLookupTranslator(yakserver.translators.LookupTranslator):
         DEVICE_CLASS_ID = None
-        TRANSLATION_TABLE = yak_server.translators.LookupTable({
-            b'a': yak_server.events.ButtonUpEvent,
-            b'b': yak_server.events.ButtonDownEvent})
+        TRANSLATION_TABLE = yakserver.translators.LookupTable({
+            b'a': yakserver.events.ButtonUpEvent,
+            b'b': yakserver.events.ButtonDownEvent})
 
     def setUp(self):
         self.translator = self.ConcreteLookupTranslator()
@@ -21,7 +21,7 @@ class TestLookupTranslator(util.TestCase):
     def test_translates_raw_data_to_event(self):
         event = self.translator.raw_data_to_event(b'b')
 
-        self.assert_event_equal(event, yak_server.events.ButtonDownEvent())
+        self.assert_event_equal(event, yakserver.events.ButtonDownEvent())
 
     def test_raw_to_event_raises_value_error_on_unknown_input(self):
         with self.assertRaises(ValueError):
@@ -32,14 +32,14 @@ class TestLookupTranslator(util.TestCase):
             self.translator.raw_data_to_event(True)
 
     def test_translates_event_to_raw_data(self):
-        event = yak_server.events.ButtonUpEvent()
+        event = yakserver.events.ButtonUpEvent()
         raw_data = self.translator.event_to_raw_data(event)
 
         self.assertEqual(raw_data, b'a')
 
     def test_event_to_raw_data_raises_value_error_on_unknown_event_type(self):
         with self.assertRaises(ValueError):
-            self.translator.event_to_raw_data(yak_server.events.Event())
+            self.translator.event_to_raw_data(yakserver.events.Event())
 
     def test_event_to_raw_data_raises_type_error_if_not_given_an_event(self):
         with self.assertRaises(TypeError):

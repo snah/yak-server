@@ -10,12 +10,12 @@ with open(README_PATH, encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
 setuptools.setup(
-    name='yak_server',
+    name='yakserver',
     version='0.1',
     description='Server for yak home automation system.',
     long_description=LONG_DESCRIPTION,
 
-    url='https://github.com/snah/yak_server',
+    url='https://github.com/snah/yak-server',
 
     author='Hans Maree',
     author_email='hans.maree@gmail.com',
@@ -30,5 +30,5 @@ setuptools.setup(
 
     keywords='',
 
-    packages=['yak_server'],
+    packages=['yakserver'],
 )

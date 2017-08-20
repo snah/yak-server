@@ -7,7 +7,7 @@ import time
 import tests.util
 import tests.doubles
 
-from yak_server import usbdevice
+from yakserver import usbdevice
 
 
 TIMEOUT = 0.1

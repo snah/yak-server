@@ -7,15 +7,15 @@ import unittest.mock
 
 from tests import util
 
-import yak_server.interface
-import yak_server.usbdevice
+import yakserver.interface
+import yakserver.usbdevice
 
 
 class TestUSBInterface(util.TestCase):
     def test_initialize_connects_to_usb_device(self):
         mock_usbdevice = unittest.mock.Mock()
-        interface = yak_server.interface.USBInterface(mock_usbdevice,
-                                                      translator=None)
+        interface = yakserver.interface.USBInterface(mock_usbdevice,
+                                                     translator=None)
 
         interface.initialize()
 
@@ -27,8 +27,8 @@ class TestUSBInterface(util.TestCase):
         stub_translator = unittest.mock.Mock()
         stub_translator.raw_data_to_event.side_effect = lambda x: x + b'_event'
         stub_translator.maximum_data_length.return_value = 1
-        interface = yak_server.interface.USBInterface(stub_usbdevice,
-                                                      stub_translator)
+        interface = yakserver.interface.USBInterface(stub_usbdevice,
+                                                     stub_translator)
         interface.translator = stub_translator
 
         event = interface.get_event()
@@ -39,8 +39,8 @@ class TestUSBInterface(util.TestCase):
         mock_usbdevice = unittest.mock.Mock()
         stub_translator = unittest.mock.Mock()
         stub_translator.event_to_raw_data.side_effect = lambda x: x[:1]
-        interface = yak_server.interface.USBInterface(mock_usbdevice,
-                                                      stub_translator)
+        interface = yakserver.interface.USBInterface(mock_usbdevice,
+                                                     stub_translator)
         interface.translator = stub_translator
 
         interface.send_command(b'a_event')
@@ -49,13 +49,13 @@ class TestUSBInterface(util.TestCase):
 
 
 class TestInterfaceManager(util.TestCase):
-    DEFAULT_DEVICE_CLASS_ID = yak_server.usbdevice.DeviceClassID(
+    DEFAULT_DEVICE_CLASS_ID = yakserver.usbdevice.DeviceClassID(
         vendor_id=0x04d8,
         product_id=0x5900,
         release_number=0x0000)
 
     class StubRawDevice:
-        def __init__(self, device_class_id=yak_server.usbdevice.DeviceClassID(
+        def __init__(self, device_class_id=yakserver.usbdevice.DeviceClassID(
                 vendor_id=0x04d8,
                 product_id=0x5900,
                 release_number=0x0000)):
@@ -67,10 +67,10 @@ class TestInterfaceManager(util.TestCase):
 
     def test_find_input_interfaces(self):
         # pylint: disable = protected-access
-        interface_manager = yak_server.interface.InterfaceManager()
+        interface_manager = yakserver.interface.InterfaceManager()
         connected_devices = [self.StubRawDevice(), self.StubRawDevice()]
 
-        usb_find_patch = unittest.mock.patch('yak_server.usbdevice.find',
+        usb_find_patch = unittest.mock.patch('yakserver.usbdevice.find',
                                              return_value=connected_devices)
         with usb_find_patch as mock_usb_find:
             interfaces = interface_manager.input_interfaces()
@@ -83,10 +83,10 @@ class TestInterfaceManager(util.TestCase):
 
     def test_find_output_interfaces(self):
         # pylint: disable = protected-access
-        interface_manager = yak_server.interface.InterfaceManager()
+        interface_manager = yakserver.interface.InterfaceManager()
         connected_devices = [self.StubRawDevice(), self.StubRawDevice()]
 
-        usb_find_patch = unittest.mock.patch('yak_server.usbdevice.find',
+        usb_find_patch = unittest.mock.patch('yakserver.usbdevice.find',
                                              return_value=connected_devices)
         with usb_find_patch as mock_usb_find:
             interfaces = interface_manager.output_interfaces()

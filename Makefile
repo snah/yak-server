@@ -1,5 +1,5 @@
 
-PYTHON_FILES := $(shell find yak_server -name '*.py')
+PYTHON_FILES := $(shell find yakserver -name '*.py')
 PYTHON_FILES += $(shell find tests -name '*.py')
 PYTHON_FILES += setup.py
 
@@ -19,7 +19,7 @@ docs: FORCE
 	sphinx-build -b html docs/ docs/_build/
 
 travis_test: FORCE
-	nose2 $(NOSE_OPTIONS) -C --coverage yak_server tests
+	nose2 $(NOSE_OPTIONS) -C --coverage yakserver tests
 
 test: FORCE
 	nose2 $(NOSE_OPTIONS) tests
@@ -31,7 +31,7 @@ functionaltest: FORCE
 	nose2 $(NOSE_OPTIONS) tests.functional
 
 coverage: FORCE
-	nose2 $(NOSE_OPTIONS) tests.unit -C  --coverage yak_server --coverage-report html
+	nose2 $(NOSE_OPTIONS) tests.unit -C  --coverage yakserver --coverage-report html
 	@sed -n 's/.*<span class="pc_cov">\([0-9]\?[0-9]\?[0-9]%\)<\/span>.*/\nCoverage: \1\n/ p' htmlcov/index.html
 
 pypytest: clean FORCE
@@ -40,7 +40,7 @@ pypytest: clean FORCE
 
 lint: fix-whitespace
 	@pylama --options=pylama_for_tests.ini tests || true
-	@pylama yak_server || true
+	@pylama yakserver || true
 	@pylama setup.py --ignore D100 || true
 
 %.fixed_whitespace: %

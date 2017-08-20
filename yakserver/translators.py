@@ -1,7 +1,7 @@
 """Defines translators for various interfaces."""
 
-from yak_server import events
-from yak_server import usbdevice
+from yakserver import events
+from yakserver import usbdevice
 
 
 class LookupTable(dict):
