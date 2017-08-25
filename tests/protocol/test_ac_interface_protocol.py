@@ -32,10 +32,10 @@ class ACInterfaceV0_0_0ProtocolTest:
         self._assert_channel_off()
 
     def _turn_channel_on(self):
-        raise NotImplementedError()
+        self.device.write(b'\x01')
 
     def _turn_channel_off(self):
-        raise NotImplementedError()
+        self.device.write(b'\x00')
 
     def _assert_channel_on(self):
         raise NotImplementedError()
@@ -49,12 +49,6 @@ class ACInterfaceV0_0_0ProtocolTest:
 
 class TestRealACInterfaceV0_0_0Protocol(ACInterfaceV0_0_0ProtocolTest,
                                         tests.util.RealDeviceTest):
-    def _turn_channel_on(self):
-        self.device.write('\x01')
-
-    def _turn_channel_off(self):
-        self.device.write('\x00')
-
     def _assert_channel_on(self):
         self.assertTrue(self._ask('Is the green LED on (Y/n)? '))
 
@@ -82,14 +76,14 @@ class TestRealACInterfaceV0_0_0Protocol(ACInterfaceV0_0_0ProtocolTest,
         return usbdevice.find_by_class_id(self.DEVICE_CLASS_ID)
 
 
-# class TestFakeACInterfaceV0_0_0Protocol(SwitchInterfaceV0_0_0ProtocolTest,
-#                                            tests.util.FakeDeviceTest):
-#    def _press_button(self):
-#        self.fake_switch_device.press_button()
-#
-#    def _release_button(self):
-#        self.fake_switch_device.release_button()
-#
-#    def _get_device(self):
-#        self.fake_switch_device = tests.doubles.FakeSwitchDeviceV0_0_0()
-#        return self.fake_switch_device
+class TestFakeACInterfaceV0_0_0Protocol(ACInterfaceV0_0_0ProtocolTest,
+                                        tests.util.FakeDeviceTest):
+    def _assert_channel_on(self):
+        self.assertTrue(self.device.channel_state)
+
+    def _assert_channel_off(self):
+        self.assertFalse(self.device.channel_state)
+
+    def _get_device(self):
+        self.fake_device = tests.doubles.FakeACDeviceV0_0_0()
+        return self.fake_device
