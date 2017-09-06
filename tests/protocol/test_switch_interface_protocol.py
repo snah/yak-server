@@ -56,11 +56,6 @@ class TestRealSwitchInterfaceV0_0_1Protocol(SwitchInterfaceV0_0_1ProtocolTest,
 
     def _get_device(self):
         devices = self._find_devices()
-        if not devices:
-            print('Please plugin the device.')
-        while not devices:
-            time.sleep(0.1)
-            devices = self._find_devices()
         return devices[0]
 
     def _find_devices(self):
